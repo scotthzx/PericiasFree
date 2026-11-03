@@ -136,6 +136,8 @@
             display: flex;
             flex-direction: column;
             transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            /* Necessário para posicionar o botão de apagar */
         }
 
         .card:hover {
@@ -150,7 +152,6 @@
             overflow: hidden;
             background-color: #000;
             display: flex;
-            /* Para colocar múltiplas imagens lado a lado se precisar */
         }
 
         .card-img-container img {
@@ -180,6 +181,32 @@
             z-index: 2;
         }
 
+        /* BOTÃO DE APAGAR (Canto superior direito da foto) */
+        .btn-delete-card {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 3;
+            background-color: rgba(231, 76, 60, 0.9);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-delete-card:hover {
+            background-color: var(--danger);
+            transform: scale(1.1);
+        }
+
         .card-info {
             padding: 15px;
             display: flex;
@@ -194,7 +221,6 @@
             margin-bottom: 5px;
         }
 
-        /* Grid para os campos de dados */
         .dados-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -324,7 +350,6 @@
             color: white;
         }
 
-        /* Grid do Formulário Admin */
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -414,10 +439,8 @@
                 </select>
             </div>
 
-            <!-- CAMPOS DINÂMICOS (Vão mudar via JS) -->
             <div id="campos-dinamicos"></div>
 
-            <!-- IMAGENS (Até 3) -->
             <div class="form-group" style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
                 <label>Link da Imagem 1 (Obrigatório):</label>
                 <input type="text" id="admin-img1" placeholder="https://...">
@@ -443,6 +466,11 @@
         const SUPABASE_URL = 'https://ygmrymdawqrfhjiwesag.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_tLfuZ5pEgj_WJeER_JhNzQ_wEm6zfi_';
 
+        // --- SENHA PARA APAGAR PERÍCIA ---
+        // Troque "pcerj123" pela senha que você quiser
+        const SENHA_ADMIN = "pcerj123";
+        // ---------------------------------
+
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -452,40 +480,31 @@
         const galeria = document.getElementById('galeria');
         const modalAdmin = document.getElementById('modalAdmin');
 
-        // --- CONFIGURAÇÃO DOS CAMPOS POR TIPO DE PERÍCIA ---
         const camposPorTipo = {
             'Caminhao': [
-                { id: 'modelo', label: 'Modelo' },
-                { id: 'placa', label: 'Placa' },
-                { id: 'proprietario', label: 'Proprietário' },
-                { id: 'passaporte', label: 'Passaporte' },
+                { id: 'modelo', label: 'Modelo' }, { id: 'placa', label: 'Placa' },
+                { id: 'proprietario', label: 'Proprietário' }, { id: 'passaporte', label: 'Passaporte' },
                 { id: 'id_trouxe', label: 'ID de quem trouxe' }
             ],
             'Veiculo': [
-                { id: 'modelo', label: 'Modelo' },
-                { id: 'placa', label: 'Placa' },
-                { id: 'proprietario', label: 'Proprietário' },
-                { id: 'passaporte', label: 'Passaporte' },
+                { id: 'modelo', label: 'Modelo' }, { id: 'placa', label: 'Placa' },
+                { id: 'proprietario', label: 'Proprietário' }, { id: 'passaporte', label: 'Passaporte' },
                 { id: 'id_denunciante', label: 'ID do denunciante' }
             ],
             'Corpo': [
-                { id: 'nome', label: 'Nome' },
-                { id: 'passaporte', label: 'Passaporte' }
+                { id: 'nome', label: 'Nome' }, { id: 'passaporte', label: 'Passaporte' }
             ],
             'FAC/ORG': [
                 { id: 'org', label: 'FAC/ORG' }
             ]
         };
 
-        // Função que desenha os campos no Admin quando muda o select
         window.alterarCamposAdmin = function () {
             const tipo = document.getElementById('admin-tipo').value;
             const container = document.getElementById('campos-dinamicos');
             container.innerHTML = '';
-
             const campos = camposPorTipo[tipo];
 
-            // Cria as linhas do formulário (2 colunas)
             let html = '<div class="form-row">';
             campos.forEach((campo, index) => {
                 html += `
@@ -494,7 +513,6 @@
                         <input type="text" id="dado-${campo.id}" placeholder="Digite ${campo.label}">
                     </div>
                 `;
-                // Quebra a linha a cada 2 campos para ficar bonito
                 if ((index + 1) % 2 === 0 && index !== campos.length - 1) {
                     html += '</div><div class="form-row">';
                 }
@@ -503,14 +521,12 @@
             container.innerHTML = html;
         };
 
-        // Inicializa os campos do admin ao carregar a página
         alterarCamposAdmin();
 
-        // 1. BUSCAR DADOS
         async function carregarPericias() {
             const { data, error } = await supabase.from('pericias').select('*').order('id', { ascending: false });
             if (error) {
-                console.error('Erro ao buscar dados:', error);
+                console.error('Erro:', error);
                 galeria.innerHTML = `<div class="vazio">Erro ao carregar as perícias.</div>`;
                 return;
             }
@@ -518,7 +534,6 @@
             renderizarGaleria();
         }
 
-        // 2. RENDERIZAR GALERIA
         function renderizarGaleria() {
             galeria.innerHTML = '';
             const periciasFiltradas = periciasGlobais.filter(p => p.tipo === abaAtual);
@@ -533,24 +548,22 @@
                 card.className = `card ${p.periciado ? 'periciado' : ''}`;
                 card.id = `card-${p.id}`;
 
-                // Pega a primeira imagem para o card principal
                 const imagemPrincipal = p.imagens && p.imagens.length > 0 ? p.imagens[0] : 'https://via.placeholder.com/300x200?text=Sem+Foto';
 
-                // Monta os campos de dados dinamicamente para o card
                 let dadosHtml = '<div class="dados-grid">';
                 if (p.dados) {
                     for (const [key, value] of Object.entries(p.dados)) {
-                        if (value) {
-                            dadosHtml += `<span><b>${key}:</b> ${value}</span>`;
-                        }
+                        if (value) dadosHtml += `<span><b>${key}:</b> ${value}</span>`;
                     }
                 }
                 dadosHtml += '</div>';
 
+                // O BOTÃO DE DELETAR AGORA APARECE PARA TODOS, MAS PEDE SENHA AO CLICAR
                 card.innerHTML = `
                     <div class="card-img-container">
                         <img src="${imagemPrincipal}" alt="Foto" onclick="window.open('${imagemPrincipal}', '_blank')">
                         <span class="tag-tipo">${p.tipo}</span>
+                        <button class="btn-delete-card" onclick="deletarPericia(${p.id})" title="Apagar Perícia">🗑️</button>
                     </div>
                     <div class="card-info">
                         <h3>${p.identificador || 'Sem Identificador'}</h3>
@@ -561,16 +574,13 @@
                             <button class="action-btn btn-periciar" onclick="marcarPericiado(${p.id})">✅ Concluir</button>
                         </div>
 
-                        <div class="status-badge">
-                            Periciado por: ${p.periciado_por || 'Desconhecido'}
-                        </div>
+                        <div class="status-badge">Periciado por: ${p.periciado_por || 'Desconhecido'}</div>
                     </div>
                 `;
                 galeria.appendChild(card);
             });
         }
 
-        // 3. MUDAR ABA
         window.mudarAba = function (tipo, botao) {
             abaAtual = tipo;
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -578,45 +588,57 @@
             renderizarGaleria();
         };
 
-        // 4. COPIAR LINK
         window.copiarLink = function (url) {
             navigator.clipboard.writeText(url).then(() => alert("Link copiado!")).catch(() => alert("Erro ao copiar."));
         };
 
-        // 5. MARCAR PERICIADO
         window.marcarPericiado = async function (id) {
             const qra = prompt("Digite seu QRA (Nome e ID):");
             if (!qra || qra.trim() === "") return;
 
             const { error } = await supabase.from('pericias').update({ periciado: true, periciado_por: qra }).eq('id', id);
+            if (error) alert("Erro ao salvar no banco.");
+            else carregarPericias();
+        };
+
+        // --- NOVA FUNÇÃO: DELETAR PERÍCIA COM SENHA ---
+        window.deletarPericia = async function (id) {
+            // 1. Pede a senha
+            const senhaDigitada = prompt("🔒 Digite a SENHA DE ADMINISTRADOR para apagar esta perícia:");
+
+            // 2. Verifica se a senha está correta
+            if (senhaDigitada !== SENHA_ADMIN) {
+                alert("Senha incorreta! Você não tem permissão para apagar.");
+                return;
+            }
+
+            // 3. Confirmação final
+            const confirmacao = confirm("Senha correta! Tem certeza que deseja APAGAR esta perícia permanentemente?");
+            if (!confirmacao) return;
+
+            // 4. Deleta do banco
+            const { error } = await supabase.from('pericias').delete().eq('id', id);
+
             if (error) {
-                alert("Erro ao salvar no banco.");
+                alert("Erro ao apagar no banco de dados.");
                 console.error(error);
             } else {
                 carregarPericias();
             }
         };
 
-        // 6. ADMIN
         window.abrirAdmin = function () { modalAdmin.style.display = 'flex'; };
         window.fecharAdmin = function () { modalAdmin.style.display = 'none'; };
 
-        // 7. SALVAR NOVA PERÍCIA
         window.salvarPericia = async function () {
             const tipo = document.getElementById('admin-tipo').value;
-
-            // Pega as imagens (remove as vazias)
             const img1 = document.getElementById('admin-img1').value;
             const img2 = document.getElementById('admin-img2').value;
             const img3 = document.getElementById('admin-img3').value;
             const imagens = [img1, img2, img3].filter(url => url.trim() !== '');
 
-            if (imagens.length === 0) {
-                alert("A imagem 1 é obrigatória!");
-                return;
-            }
+            if (imagens.length === 0) return alert("A imagem 1 é obrigatória!");
 
-            // Pega os dados dinâmicos
             const campos = camposPorTipo[tipo];
             let dados = {};
             let identificador = "Sem ID";
@@ -625,7 +647,6 @@
                 const valor = document.getElementById(`dado-${campo.id}`).value;
                 if (valor) {
                     dados[campo.label] = valor;
-                    // Define o identificador principal (Nome, Placa ou Modelo)
                     if (identificador === "Sem ID" || campo.id === 'nome' || campo.id === 'placa' || campo.id === 'modelo') {
                         identificador = valor;
                     }
@@ -633,25 +654,19 @@
             });
 
             const { error } = await supabase.from('pericias').insert([{
-                tipo: tipo,
-                identificador: identificador,
-                dados: dados,
-                imagens: imagens
+                tipo: tipo, identificador: identificador, dados: dados, imagens: imagens
             }]);
 
             if (error) {
-                alert("Erro ao salvar no banco. Verifique o console.");
-                console.error(error);
+                alert("Erro ao salvar no banco.");
             } else {
                 alert("Perícia cadastrada!");
                 fecharAdmin();
-                // Limpa os campos
                 document.querySelectorAll('.modal-content input').forEach(input => input.value = '');
                 carregarPericias();
             }
         };
 
-        // 8. TEMPO REAL
         supabase.channel('pericias-realtime').on('postgres_changes', { event: '*', schema: 'public', table: 'pericias' }, payload => {
             carregarPericias();
         }).subscribe();
