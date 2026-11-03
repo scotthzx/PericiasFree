@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perícias Free - PCERJ</title>
+    <style>
+        :root {
+            --primary: #c9a227;
+            /* Dourado PCERJ */
+            --bg: #0f1115;
+            --card-bg: #1c1f26;
+            --text: #e0e0e0;
+            --text-muted: #8b8f96;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* CABEÇALHO */
+        header {
+            background-color: #16181d;
+            border-bottom: 2px solid var(--primary);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-area img {
+            height: 60px;
+            border-radius: 50%;
+        }
+
+        /* Coloque a logo da PCERJ aqui */
+        .logo-area h1 {
+            color: var(--primary);
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .logo-area span {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: block;
+            text-transform: none;
+            letter-spacing: 1px;
+        }
+
+        .admin-btn {
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-muted);
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .admin-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* ABAS (TABS) */
+        .tabs {
+            display: flex;
+            background-color: #16181d;
+            padding: 0 20px;
+            overflow-x: auto;
+            border-bottom: 1px solid #333;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 15px 25px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            background-color: rgba(201, 162, 39, 0.05);
+        }
+
+        /* CONTAINER PRINCIPAL */
+        main {
+            padding: 30px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* GALERIA DE CARDS */
+        .galeria {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #2a2e38;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            border-color: #3a3f4b;
+        }
+
+        .card-img-container {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        .card-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: zoom-in;
+            transition: 0.3s;
+        }
+
+        .card-img-container img:hover {
+            transform: scale(1.05);
+        }
+
+        .tag-tipo {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            border: 1px solid var(--primary);
+        }
+
+        .card-info {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .card-info h3 {
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .card-info p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .card-info p b {
+            color: #ccc;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #2a2e38;
+        }
+
+        button.action-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .btn-copiar {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        .btn-copiar:hover {
+            background-color: #34495e;
+        }
+
+        .btn-periciar {
+            background-color: var(--primary);
+            color: #000;
+        }
+
+        .btn-periciar:hover {
+            background-color: #e0b834;
+        }
+
+        /* ESTADO DE PERÍCIA CONCLUÍDA */
+        .card.periciado {
+            opacity: 0.5;
+            filter: grayscale(100%);
+        }
+
+        .card.periciado .btn-group {
+            display: none;
+        }
+
+        .card.periciado .status-badge {
+            display: block;
+            text-align: center;
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: auto;
+            border: 1px solid var(--danger);
+        }
+
+        .status-badge {
+            display: none;
+        }
+
+        /* MODAL ADMIN */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--primary);
+        }
+
+        .modal-content h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #3a3f4b;
+            background-color: #16181d;
+            color: white;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btns button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-cancel {
+            background-color: #3a3f4b;
+            color: white;
+        }
+
+        .btn-save {
+            background-color: var(--primary);
+            color: black;
+        }
+
+        /* LOADING E VAZIO */
+        .loading,
+        .vazio {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-muted);
+            font-size: 18px;
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo-area">
+            <!-- SUBSTITUA O LINK ABAIXO PELA LOGO DA PCERJ -->
+            <img src="https://i.imgur.com/C658rVx.png" alt="Logo PCERJ">
+            <div>
+                <h1>Perícias Free</h1>
+                <span>Polícia Civil do Estado do Rio de Janeiro</span>
+            </div>
+        </div>
+        <!-- Botão Admin (Escondido na direita) -->
+        <button class="admin-btn" onclick="abrirAdmin()">🔒 Painel Admin</button>
+    </header>
+
+    <!-- ABAS -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tipo="Corpo" onclick="mudarAba('Corpo', this)">🫀 Corpo
+            (RG/Mochila)</button>
+        <button class="tab-btn" data-tipo="Veiculo" onclick="mudarAba('Veiculo', this)">🚗 Veículo</button>
+        <button class="tab-btn" data-tipo="Caminhao" onclick="mudarAba('Caminhao', this)">🚚 Caminhão</button>
+        <button class="tab-btn" data-tipo="FAC/ORG" onclick="mudarAba('FAC/ORG', this)">🏴 FAC/ORG</button>
+    </div>
+
+    <main>
+        <div class="galeria" id="galeria">
+            <div class="loading">Carregando perícias...</div>
+        </div>
+    </main>
+
+    <!-- MODAL DO PAINEL ADMIN -->
+    <div class="modal-overlay" id="modalAdmin">
+        <div class="modal-content">
+            <h2>Cadastrar Nova Perícia</h2>
+            <div class="form-group">
+                <label>Tipo de Perícia:</label>
+                <select id="admin-tipo">
+                    <option value="Corpo">Corpo</option>
+                    <option value="Veiculo">Veículo</option>
+                    <option value="Caminhao">Caminhão</option>
+                    <option value="FAC/ORG">FAC/ORG</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Identificador Principal (Nome / Placa / ORG):</label>
+                <input type="text" id="admin-identificador" placeholder="Ex: Nomade Trovao ou 9708CPT0">
+            </div>
+            <div class="form-group">
+                <label>Informações Extras (Passaporte, Modelo, etc.):</label>
+                <input type="text" id="admin-info" placeholder="Ex: Passaporte: 683 ou Modelo: M3">
+            </div>
+            <div class="form-group">
+                <label>Link da Imagem (URL):</label>
+                <input type="text" id="admin-imagem" placeholder="https://...">
+            </div>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="fecharAdmin()">Cancelar</button>
+                <button class="btn-save" onclick="salvarPericia()">Salvar no Banco</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONEXÃO SUPABASE -->
+    <script type="module">
+        // --- SUBSTITUA PELOS SEUS DADOS DO SUPABASE ---
+        const SUPABASE_URL = 'https://ygmrymdawqrfhjiwesag.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_tLfuZ5pEgj_WJeER_JhNzQ_wEm6zfi_';
+        // ----------------------------------------------
+
+        // Importa o SDK do Supabase via CDN
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let abaAtual = 'Corpo';
+        let periciasGlobais = [];
+
+        // Elementos
+        const galeria = document.getElementById('galeria');
+        const modalAdmin = document.getElementById('modalAdmin');
+
+        // 1. FUNÇÃO PARA BUSCAR DADOS DO SUPABASE
+        async function carregarPericias() {
+            const { data, error } = await supabase
+                .from('pericias')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (error) {
+                console.error('Erro ao buscar dados:', error);
+                galeria.innerHTML = `<div class="vazio">Erro ao carregar as perícias. Verifique a conexão.</div>`;
+                return;
+            }
+
+            periciasGlobais = data || [];
+            renderizarGaleria();
+        }
+
+        // 2. RENDERIZAR A GALERIA BASEADA NA ABA ATUAL
+        function renderizarGaleria() {
+            galeria.innerHTML = '';
+
+            // Filtra as perícias pela aba atual
+            const periciasFiltradas = periciasGlobais.filter(p => p.tipo === abaAtual);
+
+            if (periciasFiltradas.length === 0) {
+                galeria.innerHTML = `<div class="vazio">Nenhuma perícia pendente nesta categoria.</div>`;
+                return;
+            }
+
+            periciasFiltradas.forEach(p => {
+                const card = document.createElement('div');
+                card.className = `card ${p.periciado ? 'periciado' : ''}`;
+                card.id = `card-${p.id}`;
+
+                // Monta o HTML do card
+                card.innerHTML = `
+                    <div class="card-img-container">
+                        <img src="${p.imagem_url}" alt="Foto da perícia" onclick="window.open('${p.imagem_url}', '_blank')">
+                        <span class="tag-tipo">${p.tipo}</span>
+                    </div>
+                    <div class="card-info">
+                        <h3>${p.identificador}</h3>
+                        <p>${p.info_extra || 'Sem informações extras'}</p>
+                        
+                        <div class="btn-group">
+                            <button class="action-btn btn-copiar" onclick="copiarLink('${p.imagem_url}')">🔗 Copiar Foto</button>
+                            <button class="action-btn btn-periciar" onclick="marcarPericiado(${p.id})">✅ Concluir</button>
+                        </div>
+
+                        <div class="status-badge">
+                            Periciado por: ${p.periciado_por || 'Desconhecido'}
+                        </div>
+                    </div>
+                `;
+                galeria.appendChild(card);
+            });
+        }
+
+        // 3. FUNÇÃO PARA MUDAR DE ABA
+        window.mudarAba = function (tipo, botao) {
+            abaAtual = tipo;
+
+            // Atualiza a classe dos botões (visual)
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            botao.classList.add('active');
+
+            renderizarGaleria();
+        };
+
+        // 4. FUNÇÃO PARA COPIAR LINK
+        window.copiarLink = function (url) {
+            navigator.clipboard.writeText(url).then(() => {
+                alert("Link da imagem copiado!");
+            }).catch(() => {
+                alert("Não foi possível copiar. Abra a imagem em outra aba.");
+            });
+        };
+
+        // 5. FUNÇÃO PARA MARCAR COMO PERICIADO (ATUALIZA NO SUPABASE)
+        window.marcarPericiado = async function (id) {
+            const qra = prompt("Digite seu QRA (Nome e ID) para registrar a perícia:");
+            if (!qra || qra.trim() === "") return;
+
+            // Atualiza o banco de dados
+            const { error } = await supabase
+                .from('pericias')
+                .update({ periciado: true, periciado_por: qra })
+                .eq('id', id);
+
+            if (error) {
+                alert("Erro ao salvar no banco de dados.");
+                console.error(error);
+            } else {
+                // Atualiza a tela (o realtime também vai puxar, mas isso deixa mais rápido)
+                carregarPericias();
+            }
+        };
+
+        // 6. PAINEL ADMIN
+        window.abrirAdmin = function () {
+            modalAdmin.style.display = 'flex';
+        };
+        window.fecharAdmin = function () {
+            modalAdmin.style.display = 'none';
+        };
+
+        // 7. SALVAR NOVA PERÍCIA NO BANCO
+        window.salvarPericia = async function () {
+            const tipo = document.getElementById('admin-tipo').value;
+            const identificador = document.getElementById('admin-identificador').value;
+            const info_extra = document.getElementById('admin-info').value;
+            const imagem_url = document.getElementById('admin-imagem').value;
+
+            if (!identificador || !imagem_url) {
+                alert("Preencha o identificador e o link da imagem!");
+                return;
+            }
+
+            const { error } = await supabase
+                .from('pericias')
+                .insert([{
+                    tipo: tipo,
+                    identificador: identificador,
+                    info_extra: info_extra,
+                    imagem_url: imagem_url
+                }]);
+
+            if (error) {
+                alert("Erro ao salvar. Verifique as permissões do Supabase (RLS).");
+                console.error(error);
+            } else {
+                alert("Perícia cadastrada com sucesso!");
+                fecharAdmin();
+                // Limpa os campos
+                document.getElementById('admin-identificador').value = '';
+                document.getElementById('admin-info').value = '';
+                document.getElementById('admin-imagem').value = '';
+                carregarPericias();
+            }
+        };
+
+        // 8. TEMPO REAL (Se alguém marcar, atualiza para todos)
+        supabase.channel('pericias-realtime')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'pericias' }, payload => {
+                carregarPericias();
+            })
+            .subscribe();
+
+        // Inicia o site
+        carregarPericias();
+
+    </script>
+</body>
+
+</html>
