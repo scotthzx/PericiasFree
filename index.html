@@ -8,7 +8,6 @@
     <style>
         :root {
             --primary: #c9a227;
-            /* Dourado PCERJ */
             --bg: #0f1115;
             --card-bg: #1c1f26;
             --text: #e0e0e0;
@@ -52,7 +51,6 @@
             border-radius: 50%;
         }
 
-        /* Coloque a logo da PCERJ aqui */
         .logo-area h1 {
             color: var(--primary);
             font-size: 24px;
@@ -151,6 +149,8 @@
             height: 200px;
             overflow: hidden;
             background-color: #000;
+            display: flex;
+            /* Para colocar múltiplas imagens lado a lado se precisar */
         }
 
         .card-img-container img {
@@ -165,6 +165,7 @@
             transform: scale(1.05);
         }
 
+        /* Tag e Info */
         .tag-tipo {
             position: absolute;
             top: 10px;
@@ -176,6 +177,7 @@
             font-size: 11px;
             font-weight: bold;
             border: 1px solid var(--primary);
+            z-index: 2;
         }
 
         .card-info {
@@ -189,14 +191,19 @@
         .card-info h3 {
             font-size: 18px;
             color: #fff;
+            margin-bottom: 5px;
         }
 
-        .card-info p {
-            font-size: 13px;
+        /* Grid para os campos de dados */
+        .dados-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            font-size: 12px;
             color: var(--text-muted);
         }
 
-        .card-info p b {
+        .dados-grid span b {
             color: #ccc;
         }
 
@@ -282,9 +289,11 @@
             background-color: var(--card-bg);
             padding: 30px;
             border-radius: 10px;
-            width: 90%;
-            max-width: 500px;
+            width: 95%;
+            max-width: 700px;
             border: 1px solid var(--primary);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-content h2 {
@@ -315,6 +324,19 @@
             color: white;
         }
 
+        /* Grid do Formulário Admin */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .modal-btns {
             display: flex;
             gap: 10px;
@@ -340,7 +362,6 @@
             color: black;
         }
 
-        /* LOADING E VAZIO */
         .loading,
         .vazio {
             text-align: center;
@@ -356,23 +377,19 @@
 
     <header>
         <div class="logo-area">
-            <!-- SUBSTITUA O LINK ABAIXO PELA LOGO DA PCERJ -->
             <img src="https://i.imgur.com/C658rVx.png" alt="Logo PCERJ">
             <div>
                 <h1>Perícias Free</h1>
                 <span>Polícia Civil do Estado do Rio de Janeiro</span>
             </div>
         </div>
-        <!-- Botão Admin (Escondido na direita) -->
         <button class="admin-btn" onclick="abrirAdmin()">🔒 Painel Admin</button>
     </header>
 
-    <!-- ABAS -->
     <div class="tabs">
-        <button class="tab-btn active" data-tipo="Corpo" onclick="mudarAba('Corpo', this)">🫀 Corpo
-            (RG/Mochila)</button>
+        <button class="tab-btn active" data-tipo="Caminhao" onclick="mudarAba('Caminhao', this)">🚚 Caminhão</button>
         <button class="tab-btn" data-tipo="Veiculo" onclick="mudarAba('Veiculo', this)">🚗 Veículo</button>
-        <button class="tab-btn" data-tipo="Caminhao" onclick="mudarAba('Caminhao', this)">🚚 Caminhão</button>
+        <button class="tab-btn" data-tipo="Corpo" onclick="mudarAba('Corpo', this)">🫀 Corpo</button>
         <button class="tab-btn" data-tipo="FAC/ORG" onclick="mudarAba('FAC/ORG', this)">🏴 FAC/ORG</button>
     </div>
 
@@ -386,27 +403,34 @@
     <div class="modal-overlay" id="modalAdmin">
         <div class="modal-content">
             <h2>Cadastrar Nova Perícia</h2>
+
             <div class="form-group">
-                <label>Tipo de Perícia:</label>
-                <select id="admin-tipo">
-                    <option value="Corpo">Corpo</option>
-                    <option value="Veiculo">Veículo</option>
+                <label>Tipo de Perícia (Muda os campos abaixo):</label>
+                <select id="admin-tipo" onchange="alterarCamposAdmin()">
                     <option value="Caminhao">Caminhão</option>
+                    <option value="Veiculo">Veículo</option>
+                    <option value="Corpo">Corpo</option>
                     <option value="FAC/ORG">FAC/ORG</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Identificador Principal (Nome / Placa / ORG):</label>
-                <input type="text" id="admin-identificador" placeholder="Ex: Nomade Trovao ou 9708CPT0">
+
+            <!-- CAMPOS DINÂMICOS (Vão mudar via JS) -->
+            <div id="campos-dinamicos"></div>
+
+            <!-- IMAGENS (Até 3) -->
+            <div class="form-group" style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
+                <label>Link da Imagem 1 (Obrigatório):</label>
+                <input type="text" id="admin-img1" placeholder="https://...">
             </div>
             <div class="form-group">
-                <label>Informações Extras (Passaporte, Modelo, etc.):</label>
-                <input type="text" id="admin-info" placeholder="Ex: Passaporte: 683 ou Modelo: M3">
+                <label>Link da Imagem 2 (Opcional):</label>
+                <input type="text" id="admin-img2" placeholder="https://...">
             </div>
             <div class="form-group">
-                <label>Link da Imagem (URL):</label>
-                <input type="text" id="admin-imagem" placeholder="https://...">
+                <label>Link da Imagem 3 (Opcional):</label>
+                <input type="text" id="admin-img3" placeholder="https://...">
             </div>
+
             <div class="modal-btns">
                 <button class="btn-cancel" onclick="fecharAdmin()">Cancelar</button>
                 <button class="btn-save" onclick="salvarPericia()">Salvar no Banco</button>
@@ -416,44 +440,87 @@
 
     <!-- CONEXÃO SUPABASE -->
     <script type="module">
-        // --- SUBSTITUA PELOS SEUS DADOS DO SUPABASE ---
         const SUPABASE_URL = 'https://ygmrymdawqrfhjiwesag.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_tLfuZ5pEgj_WJeER_JhNzQ_wEm6zfi_';
-        // ----------------------------------------------
 
-        // Importa o SDK do Supabase via CDN
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let abaAtual = 'Corpo';
+        let abaAtual = 'Caminhao';
         let periciasGlobais = [];
 
-        // Elementos
         const galeria = document.getElementById('galeria');
         const modalAdmin = document.getElementById('modalAdmin');
 
-        // 1. FUNÇÃO PARA BUSCAR DADOS DO SUPABASE
-        async function carregarPericias() {
-            const { data, error } = await supabase
-                .from('pericias')
-                .select('*')
-                .order('id', { ascending: false });
+        // --- CONFIGURAÇÃO DOS CAMPOS POR TIPO DE PERÍCIA ---
+        const camposPorTipo = {
+            'Caminhao': [
+                { id: 'modelo', label: 'Modelo' },
+                { id: 'placa', label: 'Placa' },
+                { id: 'proprietario', label: 'Proprietário' },
+                { id: 'passaporte', label: 'Passaporte' },
+                { id: 'id_trouxe', label: 'ID de quem trouxe' }
+            ],
+            'Veiculo': [
+                { id: 'modelo', label: 'Modelo' },
+                { id: 'placa', label: 'Placa' },
+                { id: 'proprietario', label: 'Proprietário' },
+                { id: 'passaporte', label: 'Passaporte' },
+                { id: 'id_denunciante', label: 'ID do denunciante' }
+            ],
+            'Corpo': [
+                { id: 'nome', label: 'Nome' },
+                { id: 'passaporte', label: 'Passaporte' }
+            ],
+            'FAC/ORG': [
+                { id: 'org', label: 'FAC/ORG' }
+            ]
+        };
 
+        // Função que desenha os campos no Admin quando muda o select
+        window.alterarCamposAdmin = function () {
+            const tipo = document.getElementById('admin-tipo').value;
+            const container = document.getElementById('campos-dinamicos');
+            container.innerHTML = '';
+
+            const campos = camposPorTipo[tipo];
+
+            // Cria as linhas do formulário (2 colunas)
+            let html = '<div class="form-row">';
+            campos.forEach((campo, index) => {
+                html += `
+                    <div class="form-group">
+                        <label>${campo.label}:</label>
+                        <input type="text" id="dado-${campo.id}" placeholder="Digite ${campo.label}">
+                    </div>
+                `;
+                // Quebra a linha a cada 2 campos para ficar bonito
+                if ((index + 1) % 2 === 0 && index !== campos.length - 1) {
+                    html += '</div><div class="form-row">';
+                }
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        };
+
+        // Inicializa os campos do admin ao carregar a página
+        alterarCamposAdmin();
+
+        // 1. BUSCAR DADOS
+        async function carregarPericias() {
+            const { data, error } = await supabase.from('pericias').select('*').order('id', { ascending: false });
             if (error) {
                 console.error('Erro ao buscar dados:', error);
-                galeria.innerHTML = `<div class="vazio">Erro ao carregar as perícias. Verifique a conexão.</div>`;
+                galeria.innerHTML = `<div class="vazio">Erro ao carregar as perícias.</div>`;
                 return;
             }
-
             periciasGlobais = data || [];
             renderizarGaleria();
         }
 
-        // 2. RENDERIZAR A GALERIA BASEADA NA ABA ATUAL
+        // 2. RENDERIZAR GALERIA
         function renderizarGaleria() {
             galeria.innerHTML = '';
-
-            // Filtra as perícias pela aba atual
             const periciasFiltradas = periciasGlobais.filter(p => p.tipo === abaAtual);
 
             if (periciasFiltradas.length === 0) {
@@ -466,18 +533,31 @@
                 card.className = `card ${p.periciado ? 'periciado' : ''}`;
                 card.id = `card-${p.id}`;
 
-                // Monta o HTML do card
+                // Pega a primeira imagem para o card principal
+                const imagemPrincipal = p.imagens && p.imagens.length > 0 ? p.imagens[0] : 'https://via.placeholder.com/300x200?text=Sem+Foto';
+
+                // Monta os campos de dados dinamicamente para o card
+                let dadosHtml = '<div class="dados-grid">';
+                if (p.dados) {
+                    for (const [key, value] of Object.entries(p.dados)) {
+                        if (value) {
+                            dadosHtml += `<span><b>${key}:</b> ${value}</span>`;
+                        }
+                    }
+                }
+                dadosHtml += '</div>';
+
                 card.innerHTML = `
                     <div class="card-img-container">
-                        <img src="${p.imagem_url}" alt="Foto da perícia" onclick="window.open('${p.imagem_url}', '_blank')">
+                        <img src="${imagemPrincipal}" alt="Foto" onclick="window.open('${imagemPrincipal}', '_blank')">
                         <span class="tag-tipo">${p.tipo}</span>
                     </div>
                     <div class="card-info">
-                        <h3>${p.identificador}</h3>
-                        <p>${p.info_extra || 'Sem informações extras'}</p>
+                        <h3>${p.identificador || 'Sem Identificador'}</h3>
+                        ${dadosHtml}
                         
                         <div class="btn-group">
-                            <button class="action-btn btn-copiar" onclick="copiarLink('${p.imagem_url}')">🔗 Copiar Foto</button>
+                            <button class="action-btn btn-copiar" onclick="copiarLink('${imagemPrincipal}')">🔗 Copiar Foto</button>
                             <button class="action-btn btn-periciar" onclick="marcarPericiado(${p.id})">✅ Concluir</button>
                         </div>
 
@@ -490,99 +570,93 @@
             });
         }
 
-        // 3. FUNÇÃO PARA MUDAR DE ABA
+        // 3. MUDAR ABA
         window.mudarAba = function (tipo, botao) {
             abaAtual = tipo;
-
-            // Atualiza a classe dos botões (visual)
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             botao.classList.add('active');
-
             renderizarGaleria();
         };
 
-        // 4. FUNÇÃO PARA COPIAR LINK
+        // 4. COPIAR LINK
         window.copiarLink = function (url) {
-            navigator.clipboard.writeText(url).then(() => {
-                alert("Link da imagem copiado!");
-            }).catch(() => {
-                alert("Não foi possível copiar. Abra a imagem em outra aba.");
-            });
+            navigator.clipboard.writeText(url).then(() => alert("Link copiado!")).catch(() => alert("Erro ao copiar."));
         };
 
-        // 5. FUNÇÃO PARA MARCAR COMO PERICIADO (ATUALIZA NO SUPABASE)
+        // 5. MARCAR PERICIADO
         window.marcarPericiado = async function (id) {
-            const qra = prompt("Digite seu QRA (Nome e ID) para registrar a perícia:");
+            const qra = prompt("Digite seu QRA (Nome e ID):");
             if (!qra || qra.trim() === "") return;
 
-            // Atualiza o banco de dados
-            const { error } = await supabase
-                .from('pericias')
-                .update({ periciado: true, periciado_por: qra })
-                .eq('id', id);
-
+            const { error } = await supabase.from('pericias').update({ periciado: true, periciado_por: qra }).eq('id', id);
             if (error) {
-                alert("Erro ao salvar no banco de dados.");
+                alert("Erro ao salvar no banco.");
                 console.error(error);
             } else {
-                // Atualiza a tela (o realtime também vai puxar, mas isso deixa mais rápido)
                 carregarPericias();
             }
         };
 
-        // 6. PAINEL ADMIN
-        window.abrirAdmin = function () {
-            modalAdmin.style.display = 'flex';
-        };
-        window.fecharAdmin = function () {
-            modalAdmin.style.display = 'none';
-        };
+        // 6. ADMIN
+        window.abrirAdmin = function () { modalAdmin.style.display = 'flex'; };
+        window.fecharAdmin = function () { modalAdmin.style.display = 'none'; };
 
-        // 7. SALVAR NOVA PERÍCIA NO BANCO
+        // 7. SALVAR NOVA PERÍCIA
         window.salvarPericia = async function () {
             const tipo = document.getElementById('admin-tipo').value;
-            const identificador = document.getElementById('admin-identificador').value;
-            const info_extra = document.getElementById('admin-info').value;
-            const imagem_url = document.getElementById('admin-imagem').value;
 
-            if (!identificador || !imagem_url) {
-                alert("Preencha o identificador e o link da imagem!");
+            // Pega as imagens (remove as vazias)
+            const img1 = document.getElementById('admin-img1').value;
+            const img2 = document.getElementById('admin-img2').value;
+            const img3 = document.getElementById('admin-img3').value;
+            const imagens = [img1, img2, img3].filter(url => url.trim() !== '');
+
+            if (imagens.length === 0) {
+                alert("A imagem 1 é obrigatória!");
                 return;
             }
 
-            const { error } = await supabase
-                .from('pericias')
-                .insert([{
-                    tipo: tipo,
-                    identificador: identificador,
-                    info_extra: info_extra,
-                    imagem_url: imagem_url
-                }]);
+            // Pega os dados dinâmicos
+            const campos = camposPorTipo[tipo];
+            let dados = {};
+            let identificador = "Sem ID";
+
+            campos.forEach(campo => {
+                const valor = document.getElementById(`dado-${campo.id}`).value;
+                if (valor) {
+                    dados[campo.label] = valor;
+                    // Define o identificador principal (Nome, Placa ou Modelo)
+                    if (identificador === "Sem ID" || campo.id === 'nome' || campo.id === 'placa' || campo.id === 'modelo') {
+                        identificador = valor;
+                    }
+                }
+            });
+
+            const { error } = await supabase.from('pericias').insert([{
+                tipo: tipo,
+                identificador: identificador,
+                dados: dados,
+                imagens: imagens
+            }]);
 
             if (error) {
-                alert("Erro ao salvar. Verifique as permissões do Supabase (RLS).");
+                alert("Erro ao salvar no banco. Verifique o console.");
                 console.error(error);
             } else {
-                alert("Perícia cadastrada com sucesso!");
+                alert("Perícia cadastrada!");
                 fecharAdmin();
                 // Limpa os campos
-                document.getElementById('admin-identificador').value = '';
-                document.getElementById('admin-info').value = '';
-                document.getElementById('admin-imagem').value = '';
+                document.querySelectorAll('.modal-content input').forEach(input => input.value = '');
                 carregarPericias();
             }
         };
 
-        // 8. TEMPO REAL (Se alguém marcar, atualiza para todos)
-        supabase.channel('pericias-realtime')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'pericias' }, payload => {
-                carregarPericias();
-            })
-            .subscribe();
+        // 8. TEMPO REAL
+        supabase.channel('pericias-realtime').on('postgres_changes', { event: '*', schema: 'public', table: 'pericias' }, payload => {
+            carregarPericias();
+        }).subscribe();
 
-        // Inicia o site
         carregarPericias();
-
     </script>
 </body>
 
